@@ -1,88 +1,89 @@
-# 🧠 CMDGPT
+# 🧠 GeometricalAI (cmdgpt) v0.2
 
-CMDGPT is a GPT-powered Windows command-line assistant that translates natural language into real executable CMD or PowerShell commands. MicahAI runs in your terminal and uses `gpt-4o-mini` to interpret your intent and execute commands on the fly — with retry logic, clipboard copying, and more.
+A Grok-powered command-line assistant for Windows. Describe what you want in plain English, review the suggested PowerShell or CMD command, and decide whether to run it.
 
----
+## ✨ Features
 
-## 🚀 Features
+- **Natural language to commands:** turns requests into PowerShell (default) or CMD commands.
+- **Risk warnings:** commands are tagged 🚨 HIGH RISK, ⚠️ CAUTION, or ✅ Safe / Read-Only, with the reasons shown before you confirm.
+- **Confirm, edit, or copy:** run it, edit it first, copy it to the clipboard, or cancel.
+- **Live output with capture:** output streams to the terminal and is kept so Grok can fix errors.
+- **Follow-up awareness:** recent commands, their output, and the working directory are passed to the model, so follow-ups like "put a readme inside that folder" work.
+- **Chat mode with memory:** `grok your question` keeps a running conversation and can see recent command output.
+- **Usage and cost tracking:** every turn shows tokens and cost; `stats` shows session totals.
+- **History log:** every executed command is logged to `~/.cmdgpt/history.log`.
 
-* 🤖 **Natural Language to Command Execution** — Just type "create a folder with a file in it" and watch it run.
-* 🎯 **PowerShell & CMD Detection** — Automatically detects PowerShell syntax and runs appropriately.
-* 🔁 **GPT Retry System** — Fails? It'll ask GPT to revise until it works.
-* 🧠 **GPT Chat Mode** — Use `gpt your question here` to ask questions right from the terminal.
-* 📋 **Clipboard Support** — Use `c` to copy the generated command without running it.
-* 🔐 **First-Run API Key Setup** — Automatically prompts for and saves your OpenAI API key securely in a config file.
+## 🛠️ Install
 
----
+1. Extract `cmdgpt.zip`.
+2. Open PowerShell or Command Prompt in the extracted folder.
+3. Run:
 
-## 🛠️ How to Install
-
-1. Extract the cmdgpt.zip
-2. Open Command Prompt
-3. `cd` into the directory containing the cloned/extracted project
-4. Run this command:
-
-```bash
+```
 python install_and_setup.py
 ```
 
-This sets up CMDGPT so you can run it globally using:
+This installs the tool and asks for your xAI (Grok) API key on first run. You can also install directly with:
 
-```bash
+```
+pip install -e .
+```
+
+Requires Python 3.7 or newer and Windows.
+
+## 🔑 API key
+
+Provide your xAI key in either of these ways:
+
+- Set the `XAI_API_KEY` environment variable (takes priority), or
+- Enter it at first run. It's saved to `~/.cmdgpt/config.json`.
+
+The tool uses the xAI API at `https://api.x.ai/v1` with the model `grok-4.7`.
+
+## 🚀 Usage
+
+Start the assistant from any terminal:
+
+```
 cmdgpt
 ```
 
----
+`gai` works as a short alias.
 
-## 📦 Dependencies
+| Input | What it does |
+|---|---|
+| `Create a folder called ideas` | Suggests a command, shows risk, and asks what to do |
+| `grok <question>` | Chats with Grok, with conversation memory (`gpt <question>` also works) |
+| `stats` (or `cost`, `usage`) | Shows session tokens, spend, and commands run |
+| `reset` (or `clear`) | Clears chat history and recent command memory |
+| `exit` (or `quit`) | Quits |
 
-* `openai`
-* `pyperclip`
+### Confirmation
 
-Setup installs these. No need to do it yourself.
+- Normal commands: `Run command? [y]es / [e]dit / [c]opy / [n]o:`
+- HIGH RISK commands: `⚠️ HIGH RISK — Type 'yes' to run, or [e]dit / [c]opy / [n]o:`
 
----
+Edits are single-line. Copy places the command on your clipboard without running it.
 
-## 💡 How to Use
+## 🛡️ Safety
 
-Once installed, run `cmdgpt` in any command prompt.
+Risk checks are advisory: they flag likely dangerous operations but can't catch everything. Read the command before you confirm.
 
-You’ll see:
+- **HIGH RISK:** deleting files or folders, formatting or partitioning disks, registry, service, firewall, or shutdown changes, and downloads piped into execution.
+- **CAUTION:** writing or overwriting file contents, moving or renaming items, and uninstalling packages.
+- Text inside quotes and URLs is ignored by the checks.
+
+## 📁 Project layout
 
 ```
-🧠 MicahAI v0.1 — Dual-Mode Desktop Assistant with Infinite Retry Power
-Type commands like: 'Create a folder with ideas.txt inside it'
-Type 'gpt your-question-here' to chat with GPT directly.
-Type 'exit' to shut down.
+cmdgpt/
+  cmdgpt/__init__.py   package marker and version
+  cmdgpt/cli.py        all application logic
+  setup.py             package metadata and console scripts (cmdgpt, gai)
+  install_and_setup.py double-click installer
+  cmdgpt.spec          PyInstaller config for building cmdgpt.exe
 ```
 
-### Example
+## 📝 Changelog
 
-```
-You ➤ create a folder named test with a file readme.txt inside
-[MicahAI 🧠] Attempt 1 generating command...
-[MicahAI 📋] Suggested command(s):
-mkdir test && echo. > test\readme.txt
-
-Execute this? (y/c/n): y
-```
-
-And boom, it’s done.
-
----
-
-## 🧪 Development Notes
-
-* Configuration is saved to: `~/.cmdgpt/config.json`
-* The entry point is `cli.py`
-* You can run it manually using:
-
-```bash
-python cmdgpt/cli.py
-```
-
----
-
-Made by **MicahThePro** with terminal wizardry and GPT magic.
-
----
+See `RELEASE_NOTES_v0.2.md` for the full list of changes.
